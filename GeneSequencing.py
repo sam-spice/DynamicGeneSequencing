@@ -39,23 +39,43 @@ class GeneSequencing:
 
     def initialize_unbanded(self, seq1, seq2, width, height):
         value_array = [[0 for x in range(width)] for y in range(height)]
+        prev_array = [['' for x in range(width)] for y in range(height)]
         value_array[0][0] = ' '
         value_array[0][1] = '-'
         for x in range(len(seq1)):
             value_array[0][x + 2] = seq1[x]
+            prev_array[0][x + 2] = seq1[x]
         value_array[1][0] = '-'
         for y in range(len(seq2)):
             value_array[y + 2][0] = seq2[y]
+            prev_array[y + 2][0] = seq2[y]
         for x in range(2, width):
             value_array[1][x] = value_array[1][x - 1] + 5
+            prev_array[1][x] = 'left'
         for y in range(2, height):
             value_array[y][1] = value_array[y-1][1] + 5
-        return value_array
+            prev_array[y][1] = 'up'
+        return value_array, prev_array
 
-    def compare_sequence_unbanded(self, seq1, seq2):
-        width = len(seq1) + 2
-        height = len(seq2) + 2
-        value_array = self.initialize_unbanded(seq1,seq2,width,height)
+    def get_alignment(self,seq1,seq2,prev_array,height,width):
+        y = height
+        x = width
+        top_align = ''
+        left_align = ''
+        while(x > 2 and y > 2):
+            string = prev_array[y][x]
+            if string == 'diag':
+                pass
+            elif string == 'up':
+                pass
+            else:
+                pass
+
+
+    def compare_sequence_unbanded(self, seq1, seq2, align_length):
+        width = len(seq1[:align_length]) + 2
+        height = len(seq2[:align_length]) + 2
+        value_array,prev_array = self.initialize_unbanded(seq1,seq2,width,height)
         for y in range(2,height):
             for x in range(2,width):
                 left = value_array[y- 1][x] + 5
@@ -67,10 +87,18 @@ class GeneSequencing:
                     diag = diag + 1
                 new_val = min(left, up, diag)
                 value_array[y][x] = new_val
+                if new_val == diag:
+                    prev_array[y][x] = 'diag'
+                elif new_val == up:
+                    prev_array[y][x] = 'up'
+                else:
+                    prev_array[y][x] = 'left'
         for row in range(height):
             print(value_array[row])
+        for row in range(height):
+            print(prev_array[row])
 
 poly = 'polynomial'
 exp = 'exponential'
 temp = GeneSequencing()
-temp.compare_sequence_unbanded(poly,exp)
+temp.compare_sequence_unbanded(poly,exp,1000)
